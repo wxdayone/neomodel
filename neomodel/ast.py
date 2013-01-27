@@ -1,12 +1,12 @@
 
 """
-Start by index
-{'start': {'node': {'index': 'Person', 'query': 'name:Jim'}}},
+Start by index::
+    {'start': {'node': {'index': 'Person', 'query': 'name:Jim'}}},
 
-Start by node
-{'start': {'node': 23, 'as': 'self'}},
+Start by node::
+    {'start': {'node': 23, 'as': 'self'}},
 
-
+Return nodes connected via incomming 
 [
     {'start': {'node': 23, 'as': 'self'}},
     {'match': [['self', {'direction': '<', 'type': 'OWNS', 'as': 'r1'}, 'y']]},
