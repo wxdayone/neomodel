@@ -273,6 +273,10 @@ class StructuredNode(CypherMixin):
     def save(self):
         # create or update instance node
         if self.__node__:
+            if not self.category().instance.is_connected(self):
+                raise Exception("Saving existing node {} of type {} doesn't "
+                + "seem to be linked to it's category node".format(
+                    self.__node__.id, self.__class__.__name__))
             batch = CustomBatch(connection(), self.index.name, self.__node__.id)
             batch.remove_indexed_node(index=self.index.__index__, node=self.__node__)
             props = self.deflate(self.__properties__, self.__node__.id)
