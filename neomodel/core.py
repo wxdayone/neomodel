@@ -89,6 +89,7 @@ class NodeIndexManager(object):
 
     @property
     def __index__(self):
+        assert self.node_class.__name__ == self.name
         return connection().get_or_create_index(neo4j.Node, self.name)
 
 
@@ -278,6 +279,7 @@ class StructuredNode(CypherMixin):
                     self.__node__.id, self.__class__.__name__) +
                     "seem to be linked to it's category node")
             batch = CustomBatch(connection(), self.index.name, self.__node__.id)
+            assert self.index.name == self.__class__.__name__
             batch.remove_indexed_node(index=self.index.__index__, node=self.__node__)
             props = self.deflate(self.__properties__, self.__node__.id)
             batch.set_node_properties(self.__node__, props)
