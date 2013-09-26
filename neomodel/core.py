@@ -1,11 +1,15 @@
+from datetime import datetime
 from py2neo import neo4j, cypher
+from pytz import utc
 from .exception import DoesNotExist, CypherException
 from .util import camel_to_upper, CustomBatch, _legacy_conflict_check
-from .properties import Property, PropertyManager, AliasProperty
+from .properties import (Property, PropertyManager, AliasProperty,
+    JSONProperty, DateTimeProperty)
 from .relationship_manager import RelationshipManager, OUTGOING
 from .traversal import TraversalSet
 from .signals import hooks
 from .index import NodeIndexManager
+import inspect
 import logging
 import os
 import sys
@@ -14,7 +18,7 @@ logger = logging.getLogger(__name__)
 if sys.version_info >= (3, 0):
     from urllib.parse import urlparse
 else:
-    from urlparse import urlparse # noqa
+    from urlparse import urlparse  # noqa
 
 
 DATABASE_URL = os.environ.get('NEO4J_REST_URL', 'http://localhost:7474/db/data/')
@@ -60,6 +64,22 @@ class CypherMixin(object):
         return cypher_query(query, params)
 
 
+class MetadataMixin(CypherMixin):
+    _created = DateTimeProperty(index=True)
+    _modified = DateTimeProperty()
+    _caller_info = JSONProperty()
+
+    def pre_save(self):
+        now = datetime.utcnow().replace(tzinfo=utc)
+        self._modified = now
+        frames = [f[0] for f in inspect.stack()]
+        self._caller_info = [repr(inspect.getframeinfo(f)) for f in frames]
+        if not isinstance(self._created, datetime):
+            self._created = now
+        if hasattr(super(MetadataMixin, self), 'pre_save'):
+            super(MetadataMixin, self).pre_save()
+
+
 class StructuredNodeMeta(type):
     def __new__(mcs, name, bases, dct):
         dct.update({'DoesNotExist': type('DoesNotExist', (DoesNotExist,), dct)})
@@ -84,7 +104,7 @@ class StructuredNodeMeta(type):
 StructuredNodeBase = StructuredNodeMeta('StructuredNodeBase', (PropertyManager,), {})
 
 
-class StructuredNode(StructuredNodeBase, CypherMixin):
+class StructuredNode(StructuredNodeBase, MetadataMixin):
     """ Base class for nodes requiring declaration of formal structure.
 
         :ivar __node__: neo4j.Node instance bound to database for this instance
