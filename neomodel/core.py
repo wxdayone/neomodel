@@ -65,17 +65,17 @@ class CypherMixin(object):
 
 
 class MetadataMixin(CypherMixin):
-    created = DateTimeProperty(index=True)
-    modified = DateTimeProperty()
-    caller_info = JSONProperty()
+    meta_created = DateTimeProperty(index=True)
+    meta_modified = DateTimeProperty()
+    meta_trace = JSONProperty()
 
     def pre_save(self):
         now = datetime.utcnow().replace(tzinfo=utc)
-        self.modified = now
+        self.meta_modified = now
         frames = [f[0] for f in inspect.stack()]
-        self.caller_info = [repr(inspect.getframeinfo(f)) for f in frames]
-        if not isinstance(self.created, datetime):
-            self.created = now
+        self.meta_trace = [repr(inspect.getframeinfo(f)) for f in frames]
+        if not isinstance(self.meta_created, datetime):
+            self.meta_created = now
         if hasattr(super(MetadataMixin, self), 'pre_save'):
             super(MetadataMixin, self).pre_save()
 
