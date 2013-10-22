@@ -10,7 +10,6 @@ from .index import NodeIndexManager
 import logging
 import os
 import sys
-#import traceback
 logger = logging.getLogger(__name__)
 
 if sys.version_info >= (3, 0):
@@ -20,11 +19,11 @@ else:
 
 
 DATABASE_URL = os.environ.get('NEO4J_REST_URL', 'http://localhost:7474/db/data/')
+print "Set DATABASE_URL = {0}".format(DATABASE_URL)
 
 
 def connection():
 
-    #traceback.print_exc()
     print "Connection requested for {0}".format(DATABASE_URL)
     print "(current NEO4J_REST_URL env var is {0})".format(os.environ.get('NEO4J_REST_URL', 'NOT SET'))
     if hasattr(connection, 'db'):
