@@ -5,7 +5,8 @@ from .exception import UniqueProperty, DataInconsistencyError
 camel_to_upper = lambda x: "_".join(word.upper() for word in re.split(r"([A-Z][0-9a-z]*)", x)[1::2])
 upper_to_camel = lambda x: "".join(word.title() for word in x.split("_"))
 
-# the default value "true;format=pretty" causes the server to loose individual status codes in batch responses
+# the default value "true;format=pretty" causes the server to lose
+# individual status codes in batch responses
 neo4j._headers[None] = [("X-Stream", "true")]
 
 
@@ -36,8 +37,8 @@ class CustomBatch(neo4j.WriteBatch):
             if r.status_code == 200:
                 responses.close()
                 raise DataInconsistencyError(
-                        requests[i].body['key'], requests[i].body['key'],
-                        self.index_name, self.node)
+                    requests[i].body['key'], requests[i].body['key'],
+                    self.index_name, self.node)
 
 
 def _legacy_conflict_check(cls, node, props):
