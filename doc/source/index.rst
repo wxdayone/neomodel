@@ -48,3 +48,12 @@ Contents
    batch
    extending
    configuration
+
+.. module:: neomodel
+.. autoclass:: StructuredNode
+
+Indices and tables
+================== 
+
+* :ref:`genindex`
+* :ref:`modindex`
