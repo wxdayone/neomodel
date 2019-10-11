@@ -136,8 +136,12 @@ def process_filter_args(cls, kwargs):
 
     for key, value in kwargs.items():
         if '__' in key:
-            prop, operator = key.rsplit('__')
-            operator = OPERATOR_TABLE[operator]
+            prop, operator = key.rsplit('__', 1)
+            try:
+                operator = OPERATOR_TABLE[operator]
+            except KeyError:
+                prop = key
+                operator = '='
         else:
             prop = key
             operator = '='
